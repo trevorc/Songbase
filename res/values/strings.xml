@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Songbase</string>
+    <string name="activity_list">Songza Activities</string>
+    <string name="station_list">Stations</string>
+    <string name="station_detail">Station</string>
+</resources>
