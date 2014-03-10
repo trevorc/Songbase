@@ -4,4 +4,6 @@
     <string name="activity_list">Songza Activities</string>
     <string name="station_list">Stations</string>
     <string name="station_detail">Station</string>
+    <string name="save_favorite">Save Favorite</string>
+    <string name="clear_favorite">Remove Favorite</string>
 </resources>

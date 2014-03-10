@@ -160,7 +160,9 @@
   <component name="ProjectDictionaryState">
     <dictionary name="trevor">
       <words>
+        <w>accessors</w>
         <w>bitbase</w>
+        <w>songbase</w>
         <w>songza</w>
       </words>
     </dictionary>
@@ -177,13 +179,22 @@
     <mapping directory="" vcs="" />
   </component>
   <component name="libraryTable">
+    <library name="android-smart-image-view-1.0.0">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/android-smart-image-view-1.0.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="com.google.guava:guava:15.0" type="repository">
       <properties maven-id="com.google.guava:guava:15.0" />
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/15.0/guava-15.0.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.ideaLibSources/guava-15.0-sources.jar!/" />
+      </SOURCES>
     </library>
     <library name="com.loopj.android:android-async-http:1.4.4" type="repository">
       <properties maven-id="com.loopj.android:android-async-http:1.4.4" />

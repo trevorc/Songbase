@@ -20,11 +20,11 @@ import se.bitba.songbase.util.SongzaAPIClient;
 
 import java.util.List;
 
-public class ActivityList
+public class ActivityListActivity
         extends Activity
         implements AdapterView.OnItemClickListener
 {
-    private static final String TAG = ActivityList.class.getName();
+    private static final String TAG = ActivityListActivity.class.getSimpleName();
 
     private ActivityAdapter activityAdapter;
     private SongzaAPIClient apiClient;
@@ -47,7 +47,7 @@ public class ActivityList
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Log.d(TAG, String.format("onItemClick(%d)", position));
-        Intent intent = new Intent(this, StationList.class);
+        Intent intent = new Intent(this, StationListActivity.class);
         intent.putExtra(SongbaseConstants.ACTIVITY, activityAdapter.getItem(position));
         startActivity(intent);
     }
@@ -56,6 +56,7 @@ public class ActivityList
         apiClient.fetchActivities(new FetchObserver<List<SongzaActivity>>() {
             @Override
             public void onSuccess(List<SongzaActivity> result) {
+                activityAdapter.clear();
                 activityAdapter.addAll(result);
             }
 
@@ -70,7 +71,7 @@ public class ActivityList
             extends ArrayAdapter<SongzaActivity>
     {
         public ActivityAdapter() {
-            super(ActivityList.this, android.R.layout.simple_list_item_1);
+            super(ActivityListActivity.this, android.R.layout.simple_list_item_1);
         }
 
         @Override

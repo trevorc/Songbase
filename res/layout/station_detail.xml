@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:weightSum="1">
+
+    <TextView
+            android:id="@+id/station_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ededed"
+            android:padding="4sp"
+            android:layout_alignParentTop="true"/>
+
+    <Button
+            android:id="@+id/favorite_button"
+            android:text="@string/save_favorite"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_alignParentBottom="true"/>
+
+    <ListView
+            android:id="@+id/featured_artists"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@id/station_description"
+            android:layout_above="@id/favorite_button"
+            android:layout_gravity="center_horizontal"
+            android:listSelector="@android:color/transparent"
+            android:cacheColorHint="@android:color/transparent"/>
+
+</RelativeLayout>

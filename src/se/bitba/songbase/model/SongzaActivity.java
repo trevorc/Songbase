@@ -25,6 +25,8 @@ public class SongzaActivity
         this.stations = stations;
     }
 
+    /* Accessors */
+
     public String getName() {
         return name;
     }

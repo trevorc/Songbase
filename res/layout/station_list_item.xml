@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="120dp">
+
+    <com.loopj.android.image.SmartImageView
+            android:layout_width="120dp"
+            android:layout_height="fill_parent"
+            android:id="@+id/station_item_cover"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
+
+    <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="24dp"
+            android:id="@+id/station_item_name"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/station_item_cover"
+            android:textStyle="bold"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:gravity="bottom"
+            android:text="Station Title"
+            android:textSize="18sp"/>
+
+    <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/station_item_description"
+            android:layout_below="@+id/station_item_name"
+            android:layout_toRightOf="@+id/station_item_cover"
+            android:maxLines="5"
+            android:ellipsize="end"
+            android:text="Station Description"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"/>
+</RelativeLayout>

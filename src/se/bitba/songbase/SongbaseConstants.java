@@ -6,15 +6,12 @@
 
 package se.bitba.songbase;
 
-import se.bitba.songbase.util.URLUtil;
-
-import java.net.URL;
-
 public final class SongbaseConstants {
 
     /* API URLs */
-    public static final URL ACTIVITIES_URL = URLUtil.makeURL("http://dev3.songza.com/api/1/gallery/tag/activities");
-    public static final URL STATIONS_URL = URLUtil.makeURL("http://dev3.songza.com/api/1/station/multi");
+    public static final String API_BASE_URL = "http://dev3.songza.com/api/1";
+    public static final String ACTIVITIES_URL = API_BASE_URL  + "/gallery/tag/activities";
+    public static final String STATIONS_URL = API_BASE_URL + "/station/multi";
 
     /* Intent keys */
     public static final String ACTIVITY = "se.bitba.songbase.ACTIVITY";

@@ -22,7 +22,8 @@ import java.util.List;
 
 public class SongzaAPIClient
 {
-    private static final String TAG = SongzaAPIClient.class.getCanonicalName();
+    private static final String TAG = SongzaAPIClient.class.getSimpleName();
+
     private final AsyncHttpClient httpClient = new AsyncHttpClient();
 
     protected <Model> void getList(String url, ModelBuilder<Model> builder, FetchObserver<List<Model>> observer) {

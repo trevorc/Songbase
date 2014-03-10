@@ -12,31 +12,32 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import static se.bitba.songbase.util.URLUtil.makeURL;
 
 public class SongzaStation
         implements Parcelable {
     private final long id;
     private final String name;
-    private final URL coverURL;
+    private final String coverURL;
     private final String description;
     private final List<String> featuredArtists;
+    private boolean favorite;
 
-    public SongzaStation(long id, String name, URL coverURL, String description, List<String> featuredArtists) {
+    public SongzaStation(long id, String name, String coverURL, String description,
+                         List<String> featuredArtists, boolean favorite) {
         this.id = id;
         this.name = name;
         this.coverURL = coverURL;
         this.description = description;
         this.featuredArtists = featuredArtists;
+        this.favorite = favorite;
     }
 
     private SongzaStation(Parcel in) {
-        this(in.readLong(), in.readString(), makeURL(in.readString()),
-             in.readString(), in.createStringArrayList());
+        this(in.readLong(), in.readString(), in.readString(),
+             in.readString(), in.createStringArrayList(),
+             in.readByte() == 1);
     }
 
     private static List<String> parseFeaturedArtists(JSONArray featuredArtists)
@@ -48,6 +49,24 @@ public class SongzaStation
         return artists;
     }
 
+    /* Accessors */
+
+    public String getCoverURL() {
+        return coverURL;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<String> getFeaturedArtists() {
+        return featuredArtists;
+    }
+
     /* ModelBuilder implementation */
 
     public static final ModelBuilder<SongzaStation> BUILDER
@@ -56,9 +75,10 @@ public class SongzaStation
         public SongzaStation fromJSON(JSONObject object) throws JSONException {
             return new SongzaStation(object.getLong("id"),
                                      object.getString("name"),
-                                     makeURL(object.getString("cover_url")),
+                                     object.getString("cover_url"),
                                      object.getString("description"),
-                                     parseFeaturedArtists(object.getJSONArray("featured_artists")));
+                                     parseFeaturedArtists(object.getJSONArray("featured_artists")),
+                                     false);
         }
     };
 
@@ -77,8 +97,12 @@ public class SongzaStation
         }
     };
 
-    public String getName() {
-        return name;
+    public boolean toggleFavorite() {
+        return favorite = !favorite;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
     }
 
     @Override
@@ -90,8 +114,10 @@ public class SongzaStation
     public void writeToParcel(Parcel out, int flags) {
         out.writeLong(id);
         out.writeString(name);
-        out.writeString(coverURL.toString());
+        out.writeString(coverURL);
         out.writeString(description);
         out.writeStringList(featuredArtists);
+        out.writeByte((byte)(favorite ? 1 : 0));
     }
+
 }
