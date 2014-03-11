@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import static se.bitba.songbase.provider.SongbaseContract.ActivityColumns;
+import static se.bitba.songbase.provider.SongbaseContract.FavoriteColumns;
 import static se.bitba.songbase.provider.SongbaseContract.StationColumns;
 import static se.bitba.songbase.provider.SongbaseDatabase.Tables;
 
@@ -102,8 +103,8 @@ public class SongbaseProvider
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Log.d(TAG, String.format("query(%s, %s)", uri, Arrays.toString(projection)));
 
-        SQLiteDatabase db = openHelper.getReadableDatabase();
-        SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+        final SQLiteDatabase db = openHelper.getReadableDatabase();
+        final SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         assert db != null;
 
         switch (URI_MATCHER.match(uri)) {
@@ -116,9 +117,8 @@ public class SongbaseProvider
                 builder.setProjectionMap(STATION_PROJECTION_MAP);
                 final String order = sortOrder == null ? SongbaseContract.Station.DEFAULT_SORT : sortOrder;
                 return builder.query(db, projection, selection, selectionArgs, null, null, order);
-            default:
-                throw new IllegalArgumentException(String.format("unsupported URI: %s", uri));
         }
+        throw new IllegalArgumentException(String.format("unsupported URI: %s", uri));
     }
 
     @Override
@@ -149,9 +149,12 @@ public class SongbaseProvider
             }
             case FAVORITES: {
                 db.insertOrThrow(Tables.FAVORITES, null, values);
-                contentResolver.notifyChange(uri, null);
+                final Long stationId = values.getAsLong(FavoriteColumns.STATION_ID);
+                if (stationId == null) throw new IllegalArgumentException("STATION_ID is missing");
+                final Uri stationUri = SongbaseContract.Station.buildStationUri(stationId.toString());
+                contentResolver.notifyChange(stationUri, null);
                 return SongbaseContract.Favorite.buildFavoriteUri(
-                        values.getAsString(SongbaseContract.FavoriteColumns.STATION_ID));
+                        values.getAsString(FavoriteColumns.STATION_ID));
             }
         }
         throw new IllegalArgumentException(String.format("unsupported URI: %s", uri));
@@ -185,7 +188,8 @@ public class SongbaseProvider
         switch (URI_MATCHER.match(uri)) {
             case FAVORITES: {
                 int deleted = db.delete(Tables.FAVORITES, selection, selectionArgs);
-                contentResolver.notifyChange(uri, null);
+                final Uri stationUri = SongbaseContract.Station.buildStationUri(selectionArgs[0]);
+                contentResolver.notifyChange(stationUri, null);
                 return deleted;
             }
         }

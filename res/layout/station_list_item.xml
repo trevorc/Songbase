@@ -36,4 +36,5 @@
             android:text="Station Description"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"/>
+
 </RelativeLayout>

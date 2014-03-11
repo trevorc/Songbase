@@ -74,6 +74,4 @@ public class SongbaseDatabase
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // first version
     }
-
-
 }

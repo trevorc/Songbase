@@ -172,7 +172,7 @@
       <module fileurl="file://$PROJECT_DIR$/Songbase.iml" filepath="$PROJECT_DIR$/Songbase.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" assert-keyword="true" jdk-15="true" project-jdk-name="Android API 19 Platform" project-jdk-type="Android SDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" assert-keyword="true" jdk-15="true" project-jdk-name="Android 4.4.2 Google APIs" project-jdk-type="Android SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="VcsDirectoryMappings">
@@ -193,7 +193,7 @@
       </CLASSES>
       <JAVADOC />
       <SOURCES>
-        <root url="jar://$USER_HOME$/.ideaLibSources/guava-15.0-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/15.0/guava-15.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="com.loopj.android:android-async-http:1.4.4" type="repository">
@@ -203,7 +203,7 @@
       </CLASSES>
       <JAVADOC />
       <SOURCES>
-        <root url="jar://$USER_HOME$/.ideaLibSources/android-async-http-1.4.4-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/loopj/android/android-async-http/1.4.4/android-async-http-1.4.4-sources.jar!/" />
       </SOURCES>
     </library>
   </component>
