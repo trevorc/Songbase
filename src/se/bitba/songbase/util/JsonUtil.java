@@ -10,8 +10,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public final class JSONUtil
+public final class JsonUtil
 {
+    private JsonUtil() {}
+
     public static long[] getLongArray(JSONObject object, String name)
             throws JSONException {
         final JSONArray jsonArray = object.getJSONArray(name);

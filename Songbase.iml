@@ -18,6 +18,15 @@
     <orderEntry type="library" name="com.google.guava:guava:15.0" level="project" />
     <orderEntry type="library" name="com.loopj.android:android-async-http:1.4.4" level="project" />
     <orderEntry type="library" name="android-smart-image-view-1.0.0" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$APPLICATION_HOME_DIR$/lib/annotations.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

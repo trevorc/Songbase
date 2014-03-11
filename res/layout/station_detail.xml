@@ -16,7 +16,6 @@
 
     <Button
             android:id="@+id/favorite_button"
-            android:text="@string/save_favorite"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"

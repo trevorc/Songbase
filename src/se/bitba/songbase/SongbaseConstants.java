@@ -14,6 +14,8 @@ public final class SongbaseConstants {
     public static final String STATIONS_URL = API_BASE_URL + "/station/multi";
 
     /* Intent keys */
-    public static final String ACTIVITY = "se.bitba.songbase.ACTIVITY";
-    public static final String STATION = "se.bitba.songbase.STATION";
+    public static final String ACTIVITY_ID = "se.bitba.songbase.ACTIVITY_ID";
+    public static final String ACTIVITY_NAME = "se.bitba.songbase.ACTIVITY_NAME";
+    public static final String ACTIVITY_STATIONS = "se.bitba.songbase.ACTIVITY_STATIONS";
+    public static final String STATION_ID = "se.bitba.songbase.STATION";
 }
