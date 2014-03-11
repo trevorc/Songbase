@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) 2014 Bitbase LLC
+ *
+ * All rights reserved.
+ */
+
 package se.bitba.songbase.provider;
 
 import android.content.Context;
