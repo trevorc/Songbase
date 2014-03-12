@@ -15,9 +15,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ListAdapter;
@@ -33,17 +31,18 @@ public class StationDetailFragment
     private static final String TAG = StationDetailFragment.class.getSimpleName();
     private static final String STATION_ID = "STATION_ID";
 
+    private long mStationId;
+    private String mDescription;
+    private boolean mIsFavorite;
+
+    public StationDetailFragment() {
+    }
+
     public StationDetailFragment(long stationId) {
         Bundle arguments = new Bundle();
         arguments.putLong(STATION_ID, stationId);
         setArguments(arguments);
     }
-
-    private long mStationId;
-    private String mDescription;
-    private boolean mIsFavorite;
-
-    private Button mFavoriteButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,42 +67,15 @@ public class StationDetailFragment
         }
     }
 
-    private final View.OnClickListener mFavoriteButtonClickListener
-            = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            mIsFavorite = !mIsFavorite;
-            resetFavoriteButtonText();
-            final ContentValues update = new ContentValues();
-            update.put(SongbaseContract.Station.FAVORITE, mIsFavorite);
-            if (mIsFavorite) {
-                final ContentValues values = new ContentValues();
-                values.put(SongbaseContract.FavoriteColumns.STATION_ID, mStationId);
-                getActivity().getContentResolver().insert(
-                        SongbaseContract.Favorite.CONTENT_URI,
-                        values);
-            } else {
-                getActivity().getContentResolver().delete(
-                        SongbaseContract.Favorite.CONTENT_URI,
-                        SongbaseContract.Favorite.STATION_ID + "=?",
-                        new String[]{String.valueOf(mStationId)});
-            }
-        }
-    };
-
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_station_detail, container, false);
         assert view != null;
 
         final TextView stationDescription = (TextView)view.findViewById(R.id.station_description);
-        mFavoriteButton = (Button)view.findViewById(R.id.favorite_button);
-        assert stationDescription != null && mFavoriteButton != null;
+        assert stationDescription != null;
 
         stationDescription.setText(mDescription);
-        resetFavoriteButtonText();
-        mFavoriteButton.setOnClickListener(mFavoriteButtonClickListener);
-
         return view;
     }
 
@@ -112,6 +84,29 @@ public class StationDetailFragment
         super.onActivityCreated(savedInstanceState);
         getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
         getLoaderManager().initLoader(0, null, this);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_station_detail_actions, menu);
+        final MenuItem favoriteItem = menu.findItem(R.id.action_favorite);
+        favoriteItem.setChecked(mIsFavorite);
+        favoriteItem.setIcon(mIsFavorite ?
+                                     android.R.drawable.btn_star_big_on :
+                                     android.R.drawable.btn_star_big_off);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_favorite:
+                setFavorite(!mIsFavorite);
+                getActivity().invalidateOptionsMenu();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -135,8 +130,22 @@ public class StationDetailFragment
         setListAdapter(null);
     }
 
-    private void resetFavoriteButtonText() {
-        mFavoriteButton.setText(mIsFavorite ? R.string.clear_favorite : R.string.save_favorite);
+    private void setFavorite(boolean isFavorite) {
+        mIsFavorite = isFavorite;
+         final ContentValues update = new ContentValues();
+        update.put(SongbaseContract.Station.FAVORITE, mIsFavorite);
+        if (mIsFavorite) {
+            final ContentValues values = new ContentValues();
+            values.put(SongbaseContract.FavoriteColumns.STATION_ID, mStationId);
+            getActivity().getContentResolver().insert(
+                    SongbaseContract.Favorite.CONTENT_URI,
+                    values);
+        } else {
+            getActivity().getContentResolver().delete(
+                    SongbaseContract.Favorite.CONTENT_URI,
+                    SongbaseContract.Favorite.STATION_ID + "=?",
+                    new String[]{String.valueOf(mStationId)});
+        }
     }
 
     private class FeaturedArtistAdapter

@@ -21,6 +21,7 @@ import se.bitba.songbase.fetch.content.Activity;
 import se.bitba.songbase.fetch.content.FeaturedArtist;
 import se.bitba.songbase.fetch.content.Station;
 import se.bitba.songbase.provider.SongbaseContract;
+import se.bitba.songbase.util.ContextAsyncTask;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -47,37 +48,55 @@ public final class FetchManager
         return station;
     }
 
+    private static final class InsertActivitiesTask
+            extends ContextAsyncTask
+    {
+        private final JSONArray mJsonArray;
+
+        protected InsertActivitiesTask(Context context, JSONArray jsonArray) {
+            super(context);
+            mJsonArray = jsonArray;
+        }
+
+        @Override
+        protected void doInBackground() {
+            Log.d(TAG, String.format("got JSONArray[%d]", mJsonArray.length()));
+            final ContentValues[] activities = new ContentValues[mJsonArray.length()];
+            final List<ContentValues> stations = new ArrayList<>();
+
+            try {
+                for (int i = 0; i < mJsonArray.length(); ++i) {
+                    final Activity activity = new Activity(mJsonArray.getJSONObject(i));
+                    activities[i] = activity.toContent();
+                    for (long stationId : activity.getStationIds()) {
+                        stations.add(contentForBareStation(activity, stationId));
+                    }
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, "failed to parse activities", e);
+                return;
+            }
+
+            final Context context = getContext();
+            if (context == null) return;
+
+            final ContentValues[] stationsArray = stations.toArray(
+                    new ContentValues[stations.size()]);
+            int numActivities = context.getContentResolver().bulkInsert(
+                    SongbaseContract.Activity.CONTENT_URI, activities);
+            int numStations = context.getContentResolver().bulkInsert(
+                    STATION_BARE_URI, stationsArray);
+            Log.d(TAG, String.format("inserted %d activities and %d stations",
+                                     numActivities, numStations));
+        }
+    }
+
     public void fetchActivities() {
         Log.d(TAG, String.format("fetching %s", SongbaseConstants.ACTIVITIES_URL));
         mHttpClient.get(SongbaseConstants.ACTIVITIES_URL, new JsonHttpResponseHandler() {
             @Override
-            public void onSuccess(JSONArray response) {
-                Log.d(TAG, String.format("got JSONArray[%d]", response.length()));
-                final ContentValues[] activities = new ContentValues[response.length()];
-                final List<ContentValues> stations = new LinkedList<>();
-
-                try {
-                    for (int i = 0; i < response.length(); ++i) {
-                        final Activity activity = new Activity(response.getJSONObject(i));
-                        activities[i] = activity.toContent();
-                        for (long stationId : activity.getStationIds()) {
-                            stations.add(contentForBareStation(activity, stationId));
-                        }
-                    }
-                } catch (JSONException e) {
-                    Log.e(TAG, "fetchActivities failed", e);
-                    this.onFailure(e, response);
-                    return;
-                }
-
-                final ContentValues[] stationsArray = stations.toArray(
-                        new ContentValues[stations.size()]);
-                int numActivities = mContext.getContentResolver().bulkInsert(
-                        SongbaseContract.Activity.CONTENT_URI, activities);
-                int numStations = mContext.getContentResolver().bulkInsert(
-                        STATION_BARE_URI, stationsArray);
-                Log.d(TAG, String.format("inserted %d activities and %d stations",
-                                         numActivities, numStations));
+            public void onSuccess(final JSONArray response) {
+                new InsertActivitiesTask(mContext, response).execute();
             }
         });
     }
@@ -107,6 +126,51 @@ public final class FetchManager
         return stationIds;
     }
 
+    private static final class InsertStationsTask
+            extends ContextAsyncTask
+    {
+        private final JSONArray mJsonArray;
+        private String mActivityId;
+
+        protected InsertStationsTask(Context context, JSONArray jsonArray, String activityId) {
+            super(context);
+            mJsonArray = jsonArray;
+            mActivityId = activityId;
+        }
+
+        @Override
+        protected void doInBackground() {
+            Log.d(TAG, String.format("got JSONArray[%d]", mJsonArray.length()));
+            final ContentValues[] stations = new ContentValues[mJsonArray.length()];
+            final List<ContentValues> featuredArtists = new ArrayList<>();
+
+            try {
+                for (int i = 0; i < mJsonArray.length(); ++i) {
+                    final Station station = new Station(mJsonArray.getJSONObject(i));
+                    stations[i] = station.toContent(mActivityId);
+                    for (FeaturedArtist artist : station.getFeaturedArtists()) {
+                        featuredArtists.add(artist.toContent(station.getStationId()));
+                    }
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, "failed to insert stations", e);
+                return;
+            }
+
+            final Context context = getContext();
+            if (context == null) return;
+
+            final ContentValues[] featuredArtistsArray = featuredArtists.toArray(
+                    new ContentValues[featuredArtists.size()]);
+            int numStations = context.getContentResolver().bulkInsert(
+                    SongbaseContract.Station.CONTENT_URI, stations);
+            int numFeaturedArtists = context.getContentResolver().bulkInsert(
+                    SongbaseContract.FeaturedArtist.CONTENT_URI, featuredArtistsArray);
+            Log.d(TAG, String.format("created %d stations and %d artists",
+                                     numStations, numFeaturedArtists));
+        }
+    }
+
     public void fetchStations(final String activityId) {
         final RequestParams params = new RequestParams();
         for (long id : fetchStationIds(activityId)) params.add("id", Long.toString(id));
@@ -115,31 +179,7 @@ public final class FetchManager
         mHttpClient.get(SongbaseConstants.STATIONS_URL, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(JSONArray response) {
-                Log.d(TAG, String.format("got JSONArray[%d]", response.length()));
-                final ContentValues[] stations = new ContentValues[response.length()];
-                final List<ContentValues> featuredArtists = new ArrayList<>();
-
-                try {
-                    for (int i = 0; i < response.length(); ++i) {
-                        final Station station = new Station(response.getJSONObject(i));
-                        stations[i] = station.toContent(activityId);
-                        for (FeaturedArtist artist : station.getFeaturedArtists()) {
-                            featuredArtists.add(artist.toContent(station.getStationId()));
-                        }
-                    }
-                } catch (JSONException e) {
-                    Log.e(TAG, "fetchStations failed", e);
-                    this.onFailure(e, response);
-                }
-
-                final ContentValues[] featuredArtistsArray = featuredArtists.toArray(
-                        new ContentValues[featuredArtists.size()]);
-                int numStations = mContext.getContentResolver().bulkInsert(
-                        SongbaseContract.Station.CONTENT_URI, stations);
-                int numFeaturedArtists = mContext.getContentResolver().bulkInsert(
-                        SongbaseContract.FeaturedArtist.CONTENT_URI, featuredArtistsArray);
-                Log.d(TAG, String.format("created %d stations and %d artists",
-                                         numStations, numFeaturedArtists));
+                new InsertStationsTask(mContext, response, activityId).execute();
             }
         });
     }

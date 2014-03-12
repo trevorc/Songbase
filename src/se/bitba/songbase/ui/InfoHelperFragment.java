@@ -19,6 +19,9 @@ public class InfoHelperFragment
     private static final String SELECTION_ARGS = "SELECTION_ARGS";
     private Callbacks mObserver;
 
+    public InfoHelperFragment() {
+    }
+
     public InfoHelperFragment(Uri contentUri, String[] projection,
                               String selection, String[] selectionArgs) {
         Bundle arguments = new Bundle();
@@ -53,11 +56,7 @@ public class InfoHelperFragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (!cursor.moveToFirst()) return;
-        try {
-            mObserver.onInfoAvailable(this, cursor);
-        } finally {
-            cursor.close();
-        }
+        mObserver.onInfoAvailable(this, cursor);
     }
 
     @Override

@@ -17,9 +17,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
@@ -35,6 +33,12 @@ public class StationListFragment
 {
     private static final String TAG = StationListFragment.class.getSimpleName();
     private static final String ACTIVITY_ID = "ACTIVITY_ID";
+    private static final int FAVORITE_COLOR = Color.rgb(0xf2, 0xf5, 0xa9);
+
+    private String mActivityId;
+
+    public StationListFragment() {
+    }
 
     public StationListFragment(String activityId) {
         Bundle arguments = new Bundle();
@@ -42,15 +46,12 @@ public class StationListFragment
         setArguments(arguments);
     }
 
-    private String mActivityId;
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated()");
 
         mActivityId = getArguments().getString(ACTIVITY_ID);
-
         getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
         getLoaderManager().initLoader(0, null, this);
         new FetchManager(getActivity()).fetchStations(mActivityId);
@@ -91,8 +92,6 @@ public class StationListFragment
     private static class StationAdapter
             extends CursorAdapter
     {
-        private static final String TAG = StationAdapter.class.getSimpleName();
-
         public StationAdapter(Context context, Cursor cursor) {
             super(context, cursor, 0);
         }
@@ -112,7 +111,8 @@ public class StationListFragment
             imageView.setImageUrl(cursor.getString(StationsQuery.COVER_URL));
             nameView.setText(cursor.getString(StationsQuery.NAME));
             descriptionView.setText(cursor.getString(StationsQuery.DESCRIPTION));
-            view.setBackgroundColor(cursor.getInt(StationsQuery.FAVORITE) == 0 ? Color.TRANSPARENT : Color.YELLOW);
+            view.setBackgroundColor(cursor.getInt(StationsQuery.FAVORITE) == 0
+                                            ? Color.TRANSPARENT : FAVORITE_COLOR);
         }
     }
 
