@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import org.jetbrains.annotations.NotNull;
 import se.bitba.songbase.R;
 import se.bitba.songbase.provider.SongbaseContract;
 
@@ -90,7 +91,8 @@ public class StationDetailFragment
         }
     };
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_station_detail, container, false);
         assert view != null;
 

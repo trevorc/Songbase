@@ -40,7 +40,7 @@ public class StationDetailActivity
         if (manager.findFragmentByTag(INFO_HELPER) == null) {
             final InfoHelperFragment fragment = new InfoHelperFragment(
                     SongbaseContract.Station.CONTENT_URI, StationQuery.PROJECTION,
-                    StationQuery.SELECTION, new String[]{String.valueOf(stationId)}, null);
+                    StationQuery.SELECTION, new String[]{String.valueOf(stationId)});
             transaction.add(fragment, INFO_HELPER);
         }
         transaction.commit();

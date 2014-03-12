@@ -17,18 +17,15 @@ public class InfoHelperFragment
     private static final String PROJECTION = "PROJECTION";
     private static final String SELECTION = "SELECTION";
     private static final String SELECTION_ARGS = "SELECTION_ARGS";
-    private static final String ORDER_BY = "ORDER_BY";
     private Callbacks observer;
 
     public InfoHelperFragment(Uri contentUri, String[] projection,
-                              String selection, String[] selectionArgs,
-                              String orderBy) {
+                              String selection, String[] selectionArgs) {
         Bundle arguments = new Bundle();
         arguments.putParcelable(CONTENT_URI, contentUri);
         arguments.putStringArray(PROJECTION, projection);
         arguments.putString(SELECTION, selection);
         arguments.putStringArray(SELECTION_ARGS, selectionArgs);
-        arguments.putString(ORDER_BY, orderBy);
         setArguments(arguments);
     }
 
@@ -50,7 +47,7 @@ public class InfoHelperFragment
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), (Uri)args.getParcelable(CONTENT_URI),
                                 args.getStringArray(PROJECTION), args.getString(SELECTION),
-                                args.getStringArray(SELECTION_ARGS), args.getString(ORDER_BY));
+                                args.getStringArray(SELECTION_ARGS), null);
     }
 
     @Override

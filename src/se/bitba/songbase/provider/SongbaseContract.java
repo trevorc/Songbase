@@ -12,9 +12,9 @@ import android.provider.BaseColumns;
 public final class SongbaseContract
 {
     public static final String AUTHORITY = "se.bitba.songbase";
-    public static final Uri URI_BASE = Uri.parse("content://" + AUTHORITY);
-    public static final String CONTENT_TYPE_FORMAT = "vnd.android.cursor.dir/vnd.songbase.%s";
-    public static final String CONTENT_ITEM_TYPE_FORMAT = "vnd.android.cursor.item/vnd.songbase.%s";
+    private static final Uri URI_BASE = Uri.parse("content://" + AUTHORITY);
+    private static final String CONTENT_TYPE_FORMAT = "vnd.android.cursor.dir/vnd.songbase.%s";
+    private static final String CONTENT_ITEM_TYPE_FORMAT = "vnd.android.cursor.item/vnd.songbase.%s";
 
     private SongbaseContract() {}
 

@@ -7,11 +7,9 @@
 package se.bitba.songbase.ui;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import se.bitba.songbase.R;
 import se.bitba.songbase.provider.SongbaseContract;
@@ -37,7 +35,7 @@ public class StationListActivity
         if (manager.findFragmentByTag(INFO_HELPER) == null) {
             final InfoHelperFragment fragment = new InfoHelperFragment(
                     SongbaseContract.Activity.CONTENT_URI, ActivityQuery.PROJECTION,
-                    ActivityQuery.SELECTION, new String[] {activityId}, null);
+                    ActivityQuery.SELECTION, new String[] {activityId});
             transaction.add(fragment, INFO_HELPER);
         }
         transaction.commit();
