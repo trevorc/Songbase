@@ -7,86 +7,53 @@
 package se.bitba.songbase.ui;
 
 import android.app.Activity;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Intent;
-import android.content.Loader;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import se.bitba.songbase.R;
-import se.bitba.songbase.SongbaseConstants;
-import se.bitba.songbase.fetch.FetchManager;
 import se.bitba.songbase.provider.SongbaseContract;
-
-import static se.bitba.songbase.ui.StationAdapter.StationsQuery;
 
 public class StationListActivity
         extends Activity
-        implements AdapterView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>
+        implements InfoHelperFragment.Callbacks
 {
-    private static final String TAG = StationListActivity.class.getName();
-
-    private final FetchManager fetchManager = new FetchManager(); // TODO: service
-
-    private String activityId;
-    private ListView listView;
-    private Cursor cursor;
+    private static final String INFO_HELPER = "INFO_HELPER";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, String.format("onCreate() with intent %s", getIntent()));
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.activity_simple);
 
-        activityId = getIntent().getStringExtra(SongbaseConstants.ACTIVITY_ID);
-        final String activityName = getIntent().getStringExtra(SongbaseConstants.ACTIVITY_NAME);
-        assert activityId != null && activityName != null;
+        final String activityId = SongbaseContract.Activity.getActivityId(getIntent().getData());
+        final FragmentManager manager = getFragmentManager();
+        final FragmentTransaction transaction = manager.beginTransaction();
 
-        Log.d(TAG, String.format("Got songzaActivity %s", activityId));
-        setTitle(activityName);
-
-        getLoaderManager().initLoader(0, null, this);
-        fetchManager.fetchStations(this, activityId);
-
-        listView = new ListView(this);
-        listView.setOnItemClickListener(this);
-        setContentView(listView);
+        if (manager.findFragmentById(R.id.root_container) == null) {
+            transaction.add(R.id.root_container, new StationListFragment(activityId));
+        }
+        if (manager.findFragmentByTag(INFO_HELPER) == null) {
+            final InfoHelperFragment fragment = new InfoHelperFragment(
+                    SongbaseContract.Activity.CONTENT_URI, ActivityQuery.PROJECTION,
+                    ActivityQuery.SELECTION, new String[] {activityId}, null);
+            transaction.add(fragment, INFO_HELPER);
+        }
+        transaction.commit();
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (cursor == null) return;
-        cursor.moveToPosition(position);
-
-        Intent intent = new Intent(this, StationDetailActivity.class);
-        intent.putExtra(SongbaseConstants.STATION_ID, cursor.getLong(StationsQuery.STATION_ID));
-        startActivity(intent);
+    public void onInfoAvailable(InfoHelperFragment fragment, Cursor cursor) {
+        getActionBar().setTitle(cursor.getString(ActivityQuery.NAME));
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.d(TAG, "onCreateLoader()");
-        return new CursorLoader(this, SongbaseContract.Station.CONTENT_URI,
-                                StationsQuery.PROJECTION, StationsQuery.SELECTION,
-                                new String[] {activityId}, null);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.d(TAG, String.format("onLoadFinished() row count is %d", data.getCount()));
-        cursor = data;
-        listView.setAdapter(new StationAdapter(this, data));
-        data.setNotificationUri(getContentResolver(), SongbaseContract.Station.CONTENT_URI);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        Log.d(TAG, "onLoaderReset()");
-        cursor = null;
-        listView.setAdapter(null);
+    private interface ActivityQuery
+    {
+        String[] PROJECTION = {
+                SongbaseContract.ActivityColumns.NAME
+        };
+        String SELECTION = SongbaseContract.ActivityColumns.ACTIVITY_ID + "=?";
+        int NAME = 0;
     }
 }

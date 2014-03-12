@@ -164,6 +164,7 @@
         <w>bitbase</w>
         <w>songbase</w>
         <w>songza</w>
+        <w>subqueries</w>
       </words>
     </dictionary>
   </component>

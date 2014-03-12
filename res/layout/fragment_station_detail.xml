@@ -22,7 +22,7 @@
             android:layout_alignParentBottom="true"/>
 
     <ListView
-            android:id="@+id/featured_artists"
+            android:id="@android:id/list"
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_below="@id/station_description"

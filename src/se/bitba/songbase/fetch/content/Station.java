@@ -44,4 +44,8 @@ public final class Station
         values.put(SongbaseContract.Station.DESCRIPTION, description);
         return values;
     }
+
+    public long getStationId() {
+        return stationId;
+    }
 }

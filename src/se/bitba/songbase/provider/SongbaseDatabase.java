@@ -11,9 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
-import static se.bitba.songbase.provider.SongbaseContract.ActivityColumns;
-import static se.bitba.songbase.provider.SongbaseContract.FavoriteColumns;
-import static se.bitba.songbase.provider.SongbaseContract.StationColumns;
+import static se.bitba.songbase.provider.SongbaseContract.*;
 
 public class SongbaseDatabase
             extends SQLiteOpenHelper
@@ -25,12 +23,12 @@ public class SongbaseDatabase
     interface Tables {
         String ACTIVITIES = "activities";
         String STATIONS = "stations";
-        String FEATURED_ARTISTS = "featured_artists";
         String ACTIVITIES_JOIN_STATIONS = ACTIVITIES + " " +
                 "LEFT JOIN " + STATIONS + " " +
                 "ON " + ACTIVITIES + "." + ActivityColumns.ACTIVITY_ID + "=" +
                 STATIONS + "." + StationColumns.ACTIVITY_ID;
         String FAVORITES = "favorites";
+        String FEATURED_ARTISTS = "featured_artists";
     }
 
     interface Subqueries {
@@ -68,6 +66,12 @@ public class SongbaseDatabase
                            BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                            FavoriteColumns.STATION_ID + " INTEGER NOT NULL, " +
                            "UNIQUE (" + FavoriteColumns.STATION_ID + ") ON CONFLICT REPLACE)");
+        db.execSQL("CREATE TABLE " + Tables.FEATURED_ARTISTS + " (" +
+                           BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                           FeaturedArtistColumns.STATION_ID + " INTEGER NOT NULL, " +
+                           FeaturedArtistColumns.NAME + " TEXT NOT NULL, " +
+                           "UNIQUE (" + FeaturedArtistColumns.STATION_ID + ", " +
+                           FeaturedArtistColumns.NAME + ") ON CONFLICT REPLACE)");
     }
 
     @Override

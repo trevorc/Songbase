@@ -6,22 +6,24 @@
 
 package se.bitba.songbase.provider;
 
-import android.content.*;
+import android.content.ContentProvider;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
+import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Map;
 
-import static se.bitba.songbase.provider.SongbaseContract.ActivityColumns;
-import static se.bitba.songbase.provider.SongbaseContract.FavoriteColumns;
-import static se.bitba.songbase.provider.SongbaseContract.StationColumns;
+import static se.bitba.songbase.provider.SongbaseContract.*;
 import static se.bitba.songbase.provider.SongbaseDatabase.Tables;
 
 public class SongbaseProvider
@@ -36,6 +38,8 @@ public class SongbaseProvider
     private static final int STATIONS_ITEM = 22;
     private static final int FAVORITES = 30;
     private static final int FAVORITES_ITEM = 31;
+    private static final int FEATURED_ARTISTS = 40;
+    private static final int FEATURED_ARTISTS_ITEM = 41;
 
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -47,6 +51,8 @@ public class SongbaseProvider
         matcher.addURI(authority, "stations/*", STATIONS_ITEM);
         matcher.addURI(authority, "favorites", FAVORITES);
         matcher.addURI(authority, "favorites/*", FAVORITES_ITEM);
+        matcher.addURI(authority, "featured_artists", FEATURED_ARTISTS);
+        matcher.addURI(authority, "featured_artists/*", FEATURED_ARTISTS_ITEM);
 
         return matcher;
     }
@@ -74,9 +80,12 @@ public class SongbaseProvider
                 return SongbaseContract.Favorite.CONTENT_TYPE;
             case FAVORITES_ITEM:
                 return SongbaseContract.Favorite.CONTENT_ITEM_TYPE;
-            default:
-                throw new IllegalArgumentException(String.format("unsupported URI: %s", uri));
+            case FEATURED_ARTISTS:
+                return SongbaseContract.FeaturedArtist.CONTENT_TYPE;
+            case FEATURED_ARTISTS_ITEM:
+                return SongbaseContract.FeaturedArtist.CONTENT_ITEM_TYPE;
         }
+        throw new IllegalArgumentException(String.format("unsupported URI: %s", uri));
     }
 
     private static final Map<String, String> ACTIVITY_PROJECTION_MAP
@@ -102,27 +111,35 @@ public class SongbaseProvider
 
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Log.d(TAG, String.format("query(%s, %s)", uri, Arrays.toString(projection)));
+        assert CharMatcher.is('?').countIn(selection) == selectionArgs.length;
 
         final SQLiteDatabase db = openHelper.getReadableDatabase();
         final SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         assert db != null;
 
         switch (URI_MATCHER.match(uri)) {
-            case ACTIVITIES:
+            case ACTIVITIES: {
                 builder.setTables(Tables.ACTIVITIES);
                 builder.setProjectionMap(ACTIVITY_PROJECTION_MAP);
                 return builder.query(db, projection, selection, selectionArgs, null, null, null);
-            case STATIONS:
+            }
+            case STATIONS: {
                 builder.setTables(Tables.STATIONS);
                 builder.setProjectionMap(STATION_PROJECTION_MAP);
                 final String order = sortOrder == null ? SongbaseContract.Station.DEFAULT_SORT : sortOrder;
                 return builder.query(db, projection, selection, selectionArgs, null, null, order);
+            }
+            case FEATURED_ARTISTS: {
+                builder.setTables(Tables.FEATURED_ARTISTS);
+                final String order = sortOrder == null ? SongbaseContract.FeaturedArtist.DEFAULT_SORT : sortOrder;
+                return builder.query(db, projection, selection, selectionArgs, null, null, order);
+            }
         }
         throw new IllegalArgumentException(String.format("unsupported URI: %s", uri));
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(Uri uri, ContentValues values) { // TODO: boolean isBatch -> disable notifications
         final ContentResolver contentResolver = getContext().getContentResolver();
         final SQLiteDatabase db = openHelper.getWritableDatabase();
         assert contentResolver != null && db != null;
@@ -145,16 +162,21 @@ public class SongbaseProvider
                         SQLiteDatabase.CONFLICT_IGNORE :
                         SQLiteDatabase.CONFLICT_REPLACE);
                 if (!isBare) contentResolver.notifyChange(uri, null);
-                return SongbaseContract.Station.buildStationUri(values.getAsString(StationColumns.STATION_ID));
+                final Long stationId = values.getAsLong(StationColumns.STATION_ID);
+                assert stationId != null;
+                return SongbaseContract.Station.buildStationUri(stationId);
             }
             case FAVORITES: {
-                db.insertOrThrow(Tables.FAVORITES, null, values);
                 final Long stationId = values.getAsLong(FavoriteColumns.STATION_ID);
                 if (stationId == null) throw new IllegalArgumentException("STATION_ID is missing");
-                final Uri stationUri = SongbaseContract.Station.buildStationUri(stationId.toString());
-                contentResolver.notifyChange(stationUri, null);
-                return SongbaseContract.Favorite.buildFavoriteUri(
-                        values.getAsString(FavoriteColumns.STATION_ID));
+                db.insertOrThrow(Tables.FAVORITES, null, values);
+                contentResolver.notifyChange(SongbaseContract.Station.buildStationUri(stationId), null);
+                return SongbaseContract.Favorite.buildFavoriteUri(stationId);
+            }
+            case FEATURED_ARTISTS: {
+                final long featuredArtistId = db.insertOrThrow(Tables.FEATURED_ARTISTS, null, values);
+                contentResolver.notifyChange(uri, null);
+                return SongbaseContract.FeaturedArtist.buildFeaturedArtistsUri(featuredArtistId);
             }
         }
         throw new IllegalArgumentException(String.format("unsupported URI: %s", uri));
@@ -188,7 +210,8 @@ public class SongbaseProvider
         switch (URI_MATCHER.match(uri)) {
             case FAVORITES: {
                 int deleted = db.delete(Tables.FAVORITES, selection, selectionArgs);
-                final Uri stationUri = SongbaseContract.Station.buildStationUri(selectionArgs[0]);
+                final long stationId = Long.parseLong(selectionArgs[0]);
+                final Uri stationUri = SongbaseContract.Station.buildStationUri(stationId);
                 contentResolver.notifyChange(stationUri, null);
                 return deleted;
             }

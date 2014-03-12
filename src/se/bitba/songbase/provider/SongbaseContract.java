@@ -6,7 +6,6 @@
 
 package se.bitba.songbase.provider;
 
-import android.app.Activity;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -42,6 +41,10 @@ public final class SongbaseContract
         public static Uri buildActivityUri(String activityId) {
             return CONTENT_URI.buildUpon().appendPath(activityId).build();
         }
+
+        public static String getActivityId(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
     }
 
     public interface StationColumns
@@ -65,12 +68,16 @@ public final class SongbaseContract
         public static final Uri CONTENT_URI = URI_BASE.buildUpon().appendPath(PATH).build();
         public static final String CONTENT_TYPE = String.format(CONTENT_TYPE_FORMAT, "station");
         public static final String CONTENT_ITEM_TYPE = String.format(CONTENT_ITEM_TYPE_FORMAT, "station");
-        public static final String DEFAULT_SORT = "name ASC";
+        public static final String DEFAULT_SORT = StationColumns.NAME + " ASC";
 
         public static final String QUERY_PARAMETER_BARE = "bare";
 
-        public static Uri buildStationUri(String stationId) {
-            return CONTENT_URI.buildUpon().appendPath(stationId).build();
+        public static Uri buildStationUri(long stationId) {
+            return CONTENT_URI.buildUpon().appendPath(String.valueOf(stationId)).build();
+        }
+
+        public static String getStationId(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 
@@ -91,8 +98,32 @@ public final class SongbaseContract
         public static final String CONTENT_ITEM_TYPE = String.format(CONTENT_ITEM_TYPE_FORMAT, "favorite");
 
 
-        public static Uri buildFavoriteUri(String stationId) {
-            return CONTENT_URI.buildUpon().appendPath(stationId).build();
+        public static Uri buildFavoriteUri(long stationId) {
+            return CONTENT_URI.buildUpon().appendPath(String.valueOf(stationId)).build();
+        }
+    }
+
+    public interface FeaturedArtistColumns
+            extends BaseColumns
+    {
+        String STATION_ID = "station_id";
+        String NAME = "name";
+    }
+
+    public static final class FeaturedArtist
+            implements FeaturedArtistColumns
+    {
+
+        private FeaturedArtist() {}
+
+        public static final String PATH = "featured_artists";
+        public static final Uri CONTENT_URI = URI_BASE.buildUpon().appendPath(PATH).build();
+        public static final String CONTENT_TYPE = String.format(CONTENT_TYPE_FORMAT, "featured_artist");
+        public static final String CONTENT_ITEM_TYPE = String.format(CONTENT_ITEM_TYPE_FORMAT, "featured_artist");
+        public static final String DEFAULT_SORT = FeaturedArtistColumns.NAME + " ASC";
+
+        public static Uri buildFeaturedArtistsUri(long featuredArtistId) {
+            return CONTENT_URI.buildUpon().appendPath(String.valueOf(featuredArtistId)).build();
         }
     }
 }

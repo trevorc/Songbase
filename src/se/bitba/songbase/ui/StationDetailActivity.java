@@ -7,116 +7,67 @@
 package se.bitba.songbase.ui;
 
 import android.app.Activity;
-import android.content.ContentValues;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
 import se.bitba.songbase.R;
-import se.bitba.songbase.SongbaseConstants;
 import se.bitba.songbase.provider.SongbaseContract;
-
-import java.util.Collections;
 
 public class StationDetailActivity
         extends Activity
-        implements View.OnClickListener {
+        implements InfoHelperFragment.Callbacks
+{
     private static final String TAG = StationDetailActivity.class.getSimpleName();
-
-    private Button favoriteButton;
-
+    private static final String INFO_HELPER = "INFO_HELPER";
     private String activityId;
-    private long stationId;
-    private boolean isFavorite;
 
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate()");
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        setContentView(R.layout.station_detail);
+        setContentView(R.layout.activity_simple);
 
-        stationId = getIntent().getLongExtra(SongbaseConstants.STATION_ID, -1);
-        assert stationId >= 0;
-        String description;
+        final Uri uri = getIntent().getData();
+        final long stationId = Long.parseLong(SongbaseContract.Station.getStationId(uri));
+        final FragmentManager manager = getFragmentManager();
+        final FragmentTransaction transaction = manager.beginTransaction();
 
-        Cursor cursor = getContentResolver().query(
-                SongbaseContract.Station.CONTENT_URI,
-                StationQuery.PROJECTION, StationQuery.SELECTION,
-                new String[]{String.valueOf(stationId)}, null);
-        try {
-            assert cursor != null;
-            cursor.moveToNext();
-
-            setTitle(cursor.getString(StationQuery.NAME));
-            activityId = cursor.getString(StationQuery.ACTIVITY_ID);
-            isFavorite = cursor.getInt(StationQuery.FAVORITE) != 0;
-            description = cursor.getString(StationQuery.DESCRIPTION);
-        } finally {
-            cursor.close();
+        if (manager.findFragmentById(R.id.root_container) == null) {
+            transaction.add(R.id.root_container, new StationDetailFragment(stationId));
         }
-
-        final TextView stationDescription = (TextView)findViewById(R.id.station_description);
-        final ListView featuredArtists = (ListView)findViewById(R.id.featured_artists);
-        favoriteButton = (Button)findViewById(R.id.favorite_button);
-        assert stationDescription != null && featuredArtists != null && favoriteButton != null;
-
-        stationDescription.setText(description);
-        featuredArtists.setAdapter(new ArrayAdapter<>(
-                this, android.R.layout.simple_list_item_1, Collections.emptyList())); // TODO
-        resetFavoriteButtonText();
-        favoriteButton.setOnClickListener(this);
+        if (manager.findFragmentByTag(INFO_HELPER) == null) {
+            final InfoHelperFragment fragment = new InfoHelperFragment(
+                    SongbaseContract.Station.CONTENT_URI, StationQuery.PROJECTION,
+                    StationQuery.SELECTION, new String[]{String.valueOf(stationId)}, null);
+            transaction.add(fragment, INFO_HELPER);
+        }
+        transaction.commit();
     }
 
     @Override
     public Intent getParentActivityIntent() {
-        Intent parentIntent = super.getParentActivityIntent();
-        assert parentIntent != null;
-        parentIntent.putExtra(SongbaseConstants.ACTIVITY_ID, activityId);
-        parentIntent.putExtra(SongbaseConstants.ACTIVITY_NAME, ""); // TODO
-        return parentIntent;
+        Log.d(TAG, "getParentActivityIntent()");
+        if (activityId == null) return new Intent(this, ActivityListActivity.class);
+        final Uri uri = SongbaseContract.Activity.buildActivityUri(activityId);
+        return new Intent(Intent.ACTION_VIEW, uri);
     }
 
     @Override
-    public void onClick(View v) {
-        isFavorite = !isFavorite;
-        resetFavoriteButtonText();
-        final ContentValues update = new ContentValues();
-        update.put(SongbaseContract.Station.FAVORITE, isFavorite);
-        if (isFavorite) {
-            final ContentValues values = new ContentValues();
-            values.put(SongbaseContract.FavoriteColumns.STATION_ID, stationId);
-            getContentResolver().insert(
-                    SongbaseContract.Favorite.CONTENT_URI,
-                    values);
-        } else {
-            getContentResolver().delete(
-                    SongbaseContract.Favorite.CONTENT_URI,
-                    SongbaseContract.Favorite.STATION_ID + "=?",
-                    new String[]{String.valueOf(stationId)});
-        }
+    public void onInfoAvailable(InfoHelperFragment fragment, Cursor cursor) {
+        getActionBar().setTitle(cursor.getString(StationQuery.NAME));
+        activityId = cursor.getString(StationQuery.ACTIVITY_ID);
     }
 
-    private void resetFavoriteButtonText() {
-        favoriteButton.setText(isFavorite ? R.string.clear_favorite : R.string.save_favorite);
-    }
-
-    private interface StationQuery {
+    private interface StationQuery
+    {
         String[] PROJECTION = {
-                SongbaseContract.Station.ACTIVITY_ID,
-                SongbaseContract.Station.NAME,
-                SongbaseContract.Station.DESCRIPTION,
-                SongbaseContract.Station.FAVORITE
+                SongbaseContract.StationColumns.ACTIVITY_ID,
+                SongbaseContract.StationColumns.NAME
         };
-        String SELECTION = SongbaseContract.Station.STATION_ID + "=?";
+        String SELECTION = SongbaseContract.StationColumns.STATION_ID + "=?";
         int ACTIVITY_ID = 0;
         int NAME = 1;
-        int DESCRIPTION = 2;
-        int FAVORITE = 3;
     }
 }

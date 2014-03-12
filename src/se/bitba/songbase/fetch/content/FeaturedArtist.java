@@ -10,6 +10,7 @@ import android.content.ContentValues;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import se.bitba.songbase.provider.SongbaseContract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,10 @@ public final class FeaturedArtist
         return artists;
     }
 
-    public ContentValues toContent() {
-        return null;
+    public ContentValues toContent(long stationId) {
+        ContentValues values = new ContentValues();
+        values.put(SongbaseContract.FeaturedArtist.STATION_ID, stationId);
+        values.put(SongbaseContract.FeaturedArtist.NAME, name);
+        return values;
     }
 }
