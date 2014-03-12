@@ -39,46 +39,46 @@ public class StationDetailFragment
         setArguments(arguments);
     }
 
-    private long stationId;
-    private String description;
-    private boolean isFavorite;
+    private long mStationId;
+    private String mDescription;
+    private boolean mIsFavorite;
 
-    private Button favoriteButton;
+    private Button mFavoriteButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        stationId = getArguments().getLong(STATION_ID);
+        mStationId = getArguments().getLong(STATION_ID);
 
         Cursor cursor = getActivity().getContentResolver().query(
                 SongbaseContract.Station.CONTENT_URI,
                 StationQuery.PROJECTION,
                 StationQuery.SELECTION,
-                new String[]{String.valueOf(stationId)},
+                new String[]{String.valueOf(mStationId)},
                 null);
 
         assert cursor != null;
         try {
             cursor.moveToNext();
             getActivity().setTitle(cursor.getString(StationQuery.NAME));
-            isFavorite = cursor.getInt(StationQuery.FAVORITE) != 0;
-            description = cursor.getString(StationQuery.DESCRIPTION);
+            mIsFavorite = cursor.getInt(StationQuery.FAVORITE) != 0;
+            mDescription = cursor.getString(StationQuery.DESCRIPTION);
         } finally {
             cursor.close();
         }
     }
 
-    private final View.OnClickListener favoriteButtonClickListener
+    private final View.OnClickListener mFavoriteButtonClickListener
             = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            isFavorite = !isFavorite;
+            mIsFavorite = !mIsFavorite;
             resetFavoriteButtonText();
             final ContentValues update = new ContentValues();
-            update.put(SongbaseContract.Station.FAVORITE, isFavorite);
-            if (isFavorite) {
+            update.put(SongbaseContract.Station.FAVORITE, mIsFavorite);
+            if (mIsFavorite) {
                 final ContentValues values = new ContentValues();
-                values.put(SongbaseContract.FavoriteColumns.STATION_ID, stationId);
+                values.put(SongbaseContract.FavoriteColumns.STATION_ID, mStationId);
                 getActivity().getContentResolver().insert(
                         SongbaseContract.Favorite.CONTENT_URI,
                         values);
@@ -86,7 +86,7 @@ public class StationDetailFragment
                 getActivity().getContentResolver().delete(
                         SongbaseContract.Favorite.CONTENT_URI,
                         SongbaseContract.Favorite.STATION_ID + "=?",
-                        new String[]{String.valueOf(stationId)});
+                        new String[]{String.valueOf(mStationId)});
             }
         }
     };
@@ -97,12 +97,12 @@ public class StationDetailFragment
         assert view != null;
 
         final TextView stationDescription = (TextView)view.findViewById(R.id.station_description);
-        favoriteButton = (Button)view.findViewById(R.id.favorite_button);
-        assert stationDescription != null && favoriteButton != null;
+        mFavoriteButton = (Button)view.findViewById(R.id.favorite_button);
+        assert stationDescription != null && mFavoriteButton != null;
 
-        stationDescription.setText(description);
+        stationDescription.setText(mDescription);
         resetFavoriteButtonText();
-        favoriteButton.setOnClickListener(favoriteButtonClickListener);
+        mFavoriteButton.setOnClickListener(mFavoriteButtonClickListener);
 
         return view;
     }
@@ -118,7 +118,7 @@ public class StationDetailFragment
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), SongbaseContract.FeaturedArtist.CONTENT_URI,
                                 FeaturedArtistsQuery.PROJECTION, FeaturedArtistsQuery.SELECTION,
-                                new String[] {String.valueOf(stationId)}, null);
+                                new String[] {String.valueOf(mStationId)}, null);
     }
 
     @Override
@@ -136,7 +136,7 @@ public class StationDetailFragment
     }
 
     private void resetFavoriteButtonText() {
-        favoriteButton.setText(isFavorite ? R.string.clear_favorite : R.string.save_favorite);
+        mFavoriteButton.setText(mIsFavorite ? R.string.clear_favorite : R.string.save_favorite);
     }
 
     private class FeaturedArtistAdapter

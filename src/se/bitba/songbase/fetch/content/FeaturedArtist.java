@@ -17,10 +17,10 @@ import java.util.List;
 
 public final class FeaturedArtist
 {
-    private final String name;
+    private final String mName;
 
     private FeaturedArtist(String name) {
-        this.name = name;
+        this.mName = name;
     }
 
     private FeaturedArtist(JSONObject object)
@@ -40,7 +40,7 @@ public final class FeaturedArtist
     public ContentValues toContent(long stationId) {
         ContentValues values = new ContentValues();
         values.put(SongbaseContract.FeaturedArtist.STATION_ID, stationId);
-        values.put(SongbaseContract.FeaturedArtist.NAME, name);
+        values.put(SongbaseContract.FeaturedArtist.NAME, mName);
         return values;
     }
 }

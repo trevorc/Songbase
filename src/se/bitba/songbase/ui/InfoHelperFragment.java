@@ -17,7 +17,7 @@ public class InfoHelperFragment
     private static final String PROJECTION = "PROJECTION";
     private static final String SELECTION = "SELECTION";
     private static final String SELECTION_ARGS = "SELECTION_ARGS";
-    private Callbacks observer;
+    private Callbacks mObserver;
 
     public InfoHelperFragment(Uri contentUri, String[] projection,
                               String selection, String[] selectionArgs) {
@@ -34,7 +34,7 @@ public class InfoHelperFragment
         super.onAttach(activity);
         if (!(activity instanceof Callbacks)) throw new ClassCastException(
                 String.format("activity must implement %s", Callbacks.class.getSimpleName()));
-        observer = (Callbacks)activity;
+        mObserver = (Callbacks)activity;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class InfoHelperFragment
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (!cursor.moveToFirst()) return;
         try {
-            observer.onInfoAvailable(this, cursor);
+            mObserver.onInfoAvailable(this, cursor);
         } finally {
             cursor.close();
         }

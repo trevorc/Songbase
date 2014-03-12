@@ -42,25 +42,25 @@ public class StationListFragment
         setArguments(arguments);
     }
 
-    private String activityId;
+    private String mActivityId;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated()");
 
-        activityId = getArguments().getString(ACTIVITY_ID);
+        mActivityId = getArguments().getString(ACTIVITY_ID);
 
         getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
         getLoaderManager().initLoader(0, null, this);
-        new FetchManager(getActivity()).fetchStations(activityId);
+        new FetchManager(getActivity()).fetchStations(mActivityId);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), SongbaseContract.Station.CONTENT_URI,
                                 StationsQuery.PROJECTION, StationsQuery.SELECTION,
-                                new String[] {activityId}, null);
+                                new String[] {mActivityId}, null);
     }
 
     @Override
@@ -99,14 +99,11 @@ public class StationListFragment
 
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            Log.d(TAG, String.format("newView(%s, %s, %s)", context, cursor, parent));
             return LayoutInflater.from(context).inflate(R.layout.list_item_station, parent, false);
         }
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            Log.d(TAG, String.format("getView(%s, %s, %s)", view, context, cursor));
-
             final SmartImageView imageView = (SmartImageView)view.findViewById(R.id.station_item_cover);
             final TextView nameView = (TextView)view.findViewById(R.id.station_item_name);
             final TextView descriptionView = (TextView)view.findViewById(R.id.station_item_description);

@@ -23,7 +23,7 @@ public class StationDetailActivity
 {
     private static final String TAG = StationDetailActivity.class.getSimpleName();
     private static final String INFO_HELPER = "INFO_HELPER";
-    private String activityId;
+    private String mActivityId;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,15 +49,15 @@ public class StationDetailActivity
     @Override
     public Intent getParentActivityIntent() {
         Log.d(TAG, "getParentActivityIntent()");
-        if (activityId == null) return new Intent(this, ActivityListActivity.class);
-        final Uri uri = SongbaseContract.Activity.buildActivityUri(activityId);
+        if (mActivityId == null) return new Intent(this, ActivityListActivity.class);
+        final Uri uri = SongbaseContract.Activity.buildActivityUri(mActivityId);
         return new Intent(Intent.ACTION_VIEW, uri);
     }
 
     @Override
     public void onInfoAvailable(InfoHelperFragment fragment, Cursor cursor) {
         getActionBar().setTitle(cursor.getString(StationQuery.NAME));
-        activityId = cursor.getString(StationQuery.ACTIVITY_ID);
+        mActivityId = cursor.getString(StationQuery.ACTIVITY_ID);
     }
 
     private interface StationQuery

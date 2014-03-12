@@ -15,37 +15,37 @@ import java.util.List;
 
 public final class Station
 {
-    private final long stationId;
-    private final String name;
-    private final String coverUrl;
-    private final String description;
-    private final List<FeaturedArtist> featuredArtists;
+    private final long mStationId;
+    private final String mName;
+    private final String mCoverUrl;
+    private final String mDescription;
+    private final List<FeaturedArtist> mFeaturedArtists;
 
     public Station(JSONObject object)
             throws JSONException
     {
-        stationId = object.getLong("id");
-        name = object.getString("name");
-        coverUrl = object.getString("cover_url");
-        description = object.getString("description");
-        featuredArtists = FeaturedArtist.parseMany(object.getJSONArray("featured_artists"));
+        mStationId = object.getLong("id");
+        mName = object.getString("name");
+        mCoverUrl = object.getString("cover_url");
+        mDescription = object.getString("description");
+        mFeaturedArtists = FeaturedArtist.parseMany(object.getJSONArray("featured_artists"));
     }
 
     public List<FeaturedArtist> getFeaturedArtists() {
-        return featuredArtists;
+        return mFeaturedArtists;
     }
 
     public ContentValues toContent(String activityId) {
         final ContentValues values = new ContentValues();
-        values.put(SongbaseContract.Station.STATION_ID, stationId);
+        values.put(SongbaseContract.Station.STATION_ID, mStationId);
         values.put(SongbaseContract.Station.ACTIVITY_ID, activityId);
-        values.put(SongbaseContract.Station.NAME, name);
-        values.put(SongbaseContract.Station.COVER_URL, coverUrl);
-        values.put(SongbaseContract.Station.DESCRIPTION, description);
+        values.put(SongbaseContract.Station.NAME, mName);
+        values.put(SongbaseContract.Station.COVER_URL, mCoverUrl);
+        values.put(SongbaseContract.Station.DESCRIPTION, mDescription);
         return values;
     }
 
     public long getStationId() {
-        return stationId;
+        return mStationId;
     }
 }

@@ -57,11 +57,11 @@ public class SongbaseProvider
         return matcher;
     }
 
-    private SongbaseDatabase openHelper;
+    private SongbaseDatabase mOpenHelper;
 
     @Override
     public boolean onCreate() {
-        openHelper = new SongbaseDatabase(getContext());
+        mOpenHelper = new SongbaseDatabase(getContext());
         return true;
     }
 
@@ -113,7 +113,7 @@ public class SongbaseProvider
         Log.d(TAG, String.format("query(%s, %s)", uri, Arrays.toString(projection)));
         assert CharMatcher.is('?').countIn(selection) == selectionArgs.length;
 
-        final SQLiteDatabase db = openHelper.getReadableDatabase();
+        final SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         final SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         assert db != null;
 
@@ -141,7 +141,7 @@ public class SongbaseProvider
     @Override
     public Uri insert(Uri uri, ContentValues values) { // TODO: boolean isBatch -> disable notifications
         final ContentResolver contentResolver = getContext().getContentResolver();
-        final SQLiteDatabase db = openHelper.getWritableDatabase();
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         assert contentResolver != null && db != null;
 
         switch (URI_MATCHER.match(uri)) {
@@ -184,7 +184,7 @@ public class SongbaseProvider
 
     @Override
     public int bulkInsert(Uri uri, @NotNull ContentValues[] values) {
-        final SQLiteDatabase db = openHelper.getWritableDatabase();
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int numValues = values.length;
         assert db != null;
 
@@ -204,7 +204,7 @@ public class SongbaseProvider
         Log.d(TAG, String.format("delete(%s, %s, %s)", uri, selection, Arrays.toString(selectionArgs)));
 
         final ContentResolver contentResolver = getContext().getContentResolver();
-        final SQLiteDatabase db = openHelper.getWritableDatabase();
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         assert contentResolver != null && db != null;
 
         switch (URI_MATCHER.match(uri)) {

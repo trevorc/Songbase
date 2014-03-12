@@ -29,15 +29,15 @@ import java.util.List;
 public final class FetchManager
 {
     private static final String TAG = FetchManager.class.getSimpleName();
-    private final Context context;
-    private final AsyncHttpClient httpClient = new AsyncHttpClient();
+    private final Context mContext;
+    private final AsyncHttpClient mHttpClient = new AsyncHttpClient();
 
     private static final Uri STATION_BARE_URI = SongbaseContract.Station.CONTENT_URI.buildUpon()
             .appendQueryParameter(SongbaseContract.Station.QUERY_PARAMETER_BARE, "true")
             .build();
 
     public FetchManager(Context context) {
-        this.context = context;
+        this.mContext = context;
     }
 
     private static ContentValues contentForBareStation(Activity activity, long stationId) {
@@ -49,7 +49,7 @@ public final class FetchManager
 
     public void fetchActivities() {
         Log.d(TAG, String.format("fetching %s", SongbaseConstants.ACTIVITIES_URL));
-        httpClient.get(SongbaseConstants.ACTIVITIES_URL, new JsonHttpResponseHandler() {
+        mHttpClient.get(SongbaseConstants.ACTIVITIES_URL, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(JSONArray response) {
                 Log.d(TAG, String.format("got JSONArray[%d]", response.length()));
@@ -72,9 +72,9 @@ public final class FetchManager
 
                 final ContentValues[] stationsArray = stations.toArray(
                         new ContentValues[stations.size()]);
-                int numActivities = context.getContentResolver().bulkInsert(
+                int numActivities = mContext.getContentResolver().bulkInsert(
                         SongbaseContract.Activity.CONTENT_URI, activities);
-                int numStations = context.getContentResolver().bulkInsert(
+                int numStations = mContext.getContentResolver().bulkInsert(
                         STATION_BARE_URI, stationsArray);
                 Log.d(TAG, String.format("inserted %d activities and %d stations",
                                          numActivities, numStations));
@@ -90,7 +90,7 @@ public final class FetchManager
 
     private List<Long> fetchStationIds(final String activityId) {
         Log.d(TAG, String.format("fetchStationIds(%s)", activityId));
-        Cursor cursor = context.getContentResolver().query(
+        Cursor cursor = mContext.getContentResolver().query(
                 SongbaseContract.Station.CONTENT_URI,
                 StationIdQuery.PROJECTION,
                 StationIdQuery.SELECTION,
@@ -112,10 +112,9 @@ public final class FetchManager
         for (long id : fetchStationIds(activityId)) params.add("id", Long.toString(id));
 
         Log.d(TAG, String.format("fetching %s with params %s", SongbaseConstants.STATIONS_URL, params));
-        httpClient.get(SongbaseConstants.STATIONS_URL, params, new JsonHttpResponseHandler() {
+        mHttpClient.get(SongbaseConstants.STATIONS_URL, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(JSONArray response) {
-                // TODO: asynctask
                 Log.d(TAG, String.format("got JSONArray[%d]", response.length()));
                 final ContentValues[] stations = new ContentValues[response.length()];
                 final List<ContentValues> featuredArtists = new ArrayList<>();
@@ -135,13 +134,12 @@ public final class FetchManager
 
                 final ContentValues[] featuredArtistsArray = featuredArtists.toArray(
                         new ContentValues[featuredArtists.size()]);
-                int numStations = context.getContentResolver().bulkInsert(
+                int numStations = mContext.getContentResolver().bulkInsert(
                         SongbaseContract.Station.CONTENT_URI, stations);
-                int numFeaturedArtists = context.getContentResolver().bulkInsert(
+                int numFeaturedArtists = mContext.getContentResolver().bulkInsert(
                         SongbaseContract.FeaturedArtist.CONTENT_URI, featuredArtistsArray);
                 Log.d(TAG, String.format("created %d stations and %d artists",
                                          numStations, numFeaturedArtists));
-
             }
         });
     }
