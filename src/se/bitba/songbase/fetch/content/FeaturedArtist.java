@@ -20,7 +20,7 @@ public final class FeaturedArtist
     private final String mName;
 
     private FeaturedArtist(String name) {
-        this.mName = name;
+        mName = name;
     }
 
     private FeaturedArtist(JSONObject object)
@@ -30,7 +30,7 @@ public final class FeaturedArtist
 
     public static List<FeaturedArtist> parseMany(JSONArray featuredArtists)
             throws JSONException {
-        List<FeaturedArtist> artists = new ArrayList<>();
+        final List<FeaturedArtist> artists = new ArrayList<>();
         for (int i = 0; i < featuredArtists.length(); ++i) {
             artists.add(new FeaturedArtist(featuredArtists.getJSONObject(i)));
         }
@@ -38,7 +38,7 @@ public final class FeaturedArtist
     }
 
     public ContentValues toContent(long stationId) {
-        ContentValues values = new ContentValues();
+        final ContentValues values = new ContentValues();
         values.put(SongbaseContract.FeaturedArtist.STATION_ID, stationId);
         values.put(SongbaseContract.FeaturedArtist.NAME, mName);
         return values;

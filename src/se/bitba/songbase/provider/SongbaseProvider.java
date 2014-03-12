@@ -12,6 +12,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -23,7 +24,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Map;
 
-import static se.bitba.songbase.provider.SongbaseContract.*;
+import static se.bitba.songbase.provider.SongbaseContract.ActivityColumns;
+import static se.bitba.songbase.provider.SongbaseContract.FavoriteColumns;
+import static se.bitba.songbase.provider.SongbaseContract.StationColumns;
 import static se.bitba.songbase.provider.SongbaseDatabase.Tables;
 
 public class SongbaseProvider
@@ -57,7 +60,7 @@ public class SongbaseProvider
         return matcher;
     }
 
-    private SongbaseDatabase mOpenHelper;
+    private SQLiteOpenHelper mOpenHelper;
 
     @Override
     public boolean onCreate() {
@@ -109,6 +112,7 @@ public class SongbaseProvider
             .put(StationColumns.FAVORITE, SongbaseDatabase.Subqueries.IS_FAVORITE)
             .build();
 
+    @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Log.d(TAG, String.format("query(%s, %s)", uri, Arrays.toString(projection)));
         assert CharMatcher.is('?').countIn(selection) == selectionArgs.length;
@@ -208,13 +212,12 @@ public class SongbaseProvider
         assert contentResolver != null && db != null;
 
         switch (URI_MATCHER.match(uri)) {
-            case FAVORITES: {
-                int deleted = db.delete(Tables.FAVORITES, selection, selectionArgs);
+            case FAVORITES:
+                final int deleted = db.delete(Tables.FAVORITES, selection, selectionArgs);
                 final long stationId = Long.parseLong(selectionArgs[0]);
                 final Uri stationUri = SongbaseContract.Station.buildStationUri(stationId);
                 contentResolver.notifyChange(stationUri, null);
                 return deleted;
-            }
         }
         throw new IllegalArgumentException(String.format("unsupported URI: %s", uri));
     }

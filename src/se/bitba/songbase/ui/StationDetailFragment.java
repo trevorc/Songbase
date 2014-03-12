@@ -16,9 +16,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
-import android.widget.Button;
 import android.widget.CursorAdapter;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 import org.jetbrains.annotations.NotNull;
 import se.bitba.songbase.R;
@@ -39,7 +37,7 @@ public class StationDetailFragment
     }
 
     public StationDetailFragment(long stationId) {
-        Bundle arguments = new Bundle();
+        final Bundle arguments = new Bundle();
         arguments.putLong(STATION_ID, stationId);
         setArguments(arguments);
     }
@@ -49,7 +47,7 @@ public class StationDetailFragment
         super.onCreate(savedInstanceState);
         mStationId = getArguments().getLong(STATION_ID);
 
-        Cursor cursor = getActivity().getContentResolver().query(
+        final Cursor cursor = getActivity().getContentResolver().query(
                 SongbaseContract.Station.CONTENT_URI,
                 StationQuery.PROJECTION,
                 StationQuery.SELECTION,
@@ -150,7 +148,6 @@ public class StationDetailFragment
 
     private class FeaturedArtistAdapter
             extends CursorAdapter
-            implements ListAdapter
     {
         public FeaturedArtistAdapter(Cursor cursor) {
             super(getActivity(), cursor, 0);

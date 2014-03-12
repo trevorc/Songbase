@@ -3,7 +3,5 @@
     <string name="app_name">Songbase</string>
     <string name="station_list">Stations</string>
     <string name="station_detail">Station</string>
-    <string name="save_favorite">Save Favorite</string>
-    <string name="clear_favorite">Remove Favorite</string>
     <string name="favorite">Favorite</string>
 </resources>

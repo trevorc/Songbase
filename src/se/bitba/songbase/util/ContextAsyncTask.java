@@ -16,7 +16,7 @@ public abstract class ContextAsyncTask
 {
     protected abstract void doInBackground();
 
-    final WeakReference<Context> mContextRef;
+    private final WeakReference<Context> mContextRef;
 
     protected ContextAsyncTask(Context context) {
         mContextRef = new WeakReference<>(context);

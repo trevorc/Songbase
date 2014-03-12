@@ -24,6 +24,7 @@ import se.bitba.songbase.provider.SongbaseContract;
 import se.bitba.songbase.util.ContextAsyncTask;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public final class FetchManager
             .build();
 
     public FetchManager(Context context) {
-        this.mContext = context;
+        mContext = context;
     }
 
     private static ContentValues contentForBareStation(Activity activity, long stationId) {
@@ -53,7 +54,7 @@ public final class FetchManager
     {
         private final JSONArray mJsonArray;
 
-        protected InsertActivitiesTask(Context context, JSONArray jsonArray) {
+        InsertActivitiesTask(Context context, JSONArray jsonArray) {
             super(context);
             mJsonArray = jsonArray;
         }
@@ -82,9 +83,9 @@ public final class FetchManager
 
             final ContentValues[] stationsArray = stations.toArray(
                     new ContentValues[stations.size()]);
-            int numActivities = context.getContentResolver().bulkInsert(
+            final int numActivities = context.getContentResolver().bulkInsert(
                     SongbaseContract.Activity.CONTENT_URI, activities);
-            int numStations = context.getContentResolver().bulkInsert(
+            final int numStations = context.getContentResolver().bulkInsert(
                     STATION_BARE_URI, stationsArray);
             Log.d(TAG, String.format("inserted %d activities and %d stations",
                                      numActivities, numStations));
@@ -107,16 +108,16 @@ public final class FetchManager
         int STATION_ID = 0;
     }
 
-    private List<Long> fetchStationIds(final String activityId) {
+    private Iterable<Long> fetchStationIds(final String activityId) {
         Log.d(TAG, String.format("fetchStationIds(%s)", activityId));
-        Cursor cursor = mContext.getContentResolver().query(
+        final Cursor cursor = mContext.getContentResolver().query(
                 SongbaseContract.Station.CONTENT_URI,
                 StationIdQuery.PROJECTION,
                 StationIdQuery.SELECTION,
                 new String[] {activityId},
                 null);
         assert cursor != null;
-        List<Long> stationIds = new LinkedList<>();
+        final Collection<Long> stationIds = new LinkedList<>();
         try {
             while (cursor.moveToNext()) stationIds.add(cursor.getLong(StationIdQuery.STATION_ID));
             Log.d(TAG, String.format("found %s stations", cursor.getCount()));
@@ -130,9 +131,9 @@ public final class FetchManager
             extends ContextAsyncTask
     {
         private final JSONArray mJsonArray;
-        private String mActivityId;
+        private final String mActivityId;
 
-        protected InsertStationsTask(Context context, JSONArray jsonArray, String activityId) {
+        InsertStationsTask(Context context, JSONArray jsonArray, String activityId) {
             super(context);
             mJsonArray = jsonArray;
             mActivityId = activityId;
@@ -162,9 +163,9 @@ public final class FetchManager
 
             final ContentValues[] featuredArtistsArray = featuredArtists.toArray(
                     new ContentValues[featuredArtists.size()]);
-            int numStations = context.getContentResolver().bulkInsert(
+            final int numStations = context.getContentResolver().bulkInsert(
                     SongbaseContract.Station.CONTENT_URI, stations);
-            int numFeaturedArtists = context.getContentResolver().bulkInsert(
+            final int numFeaturedArtists = context.getContentResolver().bulkInsert(
                     SongbaseContract.FeaturedArtist.CONTENT_URI, featuredArtistsArray);
             Log.d(TAG, String.format("created %d stations and %d artists",
                                      numStations, numFeaturedArtists));

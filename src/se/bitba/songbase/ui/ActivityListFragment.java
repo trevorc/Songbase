@@ -62,7 +62,7 @@ public class ActivityListFragment
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (getListAdapter() == null) return;
-        Cursor cursor = ((CursorAdapter)getListAdapter()).getCursor();
+        final Cursor cursor = ((CursorAdapter)getListAdapter()).getCursor();
         assert cursor != null;
 
         cursor.moveToPosition(position);

@@ -17,7 +17,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
@@ -41,7 +43,7 @@ public class StationListFragment
     }
 
     public StationListFragment(String activityId) {
-        Bundle arguments = new Bundle();
+        final Bundle arguments = new Bundle();
         arguments.putString(ACTIVITY_ID, activityId);
         setArguments(arguments);
     }

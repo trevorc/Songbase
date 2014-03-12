@@ -25,6 +25,7 @@ public class StationDetailActivity
     private static final String INFO_HELPER = "INFO_HELPER";
     private String mActivityId;
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple);

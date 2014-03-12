@@ -24,7 +24,7 @@ public class InfoHelperFragment
 
     public InfoHelperFragment(Uri contentUri, String[] projection,
                               String selection, String[] selectionArgs) {
-        Bundle arguments = new Bundle();
+        final Bundle arguments = new Bundle();
         arguments.putParcelable(CONTENT_URI, contentUri);
         arguments.putStringArray(PROJECTION, projection);
         arguments.putString(SELECTION, selection);
@@ -35,8 +35,6 @@ public class InfoHelperFragment
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (!(activity instanceof Callbacks)) throw new ClassCastException(
-                String.format("activity must implement %s", Callbacks.class.getSimpleName()));
         mObserver = (Callbacks)activity;
     }
 

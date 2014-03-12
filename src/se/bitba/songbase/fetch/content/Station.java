@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import se.bitba.songbase.provider.SongbaseContract;
 
+import java.util.Collections;
 import java.util.List;
 
 public final class Station
@@ -31,8 +32,8 @@ public final class Station
         mFeaturedArtists = FeaturedArtist.parseMany(object.getJSONArray("featured_artists"));
     }
 
-    public List<FeaturedArtist> getFeaturedArtists() {
-        return mFeaturedArtists;
+    public Iterable<FeaturedArtist> getFeaturedArtists() {
+        return Collections.unmodifiableList(mFeaturedArtists);
     }
 
     public ContentValues toContent(String activityId) {

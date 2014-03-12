@@ -7,6 +7,7 @@
 package se.bitba.songbase;
 
 public final class SongbaseConstants {
+    private SongbaseConstants() {}
 
     /* API URLs */
     private static final String API_BASE_URL = "http://dev3.songza.com/api/1";
