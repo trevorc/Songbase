@@ -48,6 +48,8 @@ public class ActivityListFragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.d(TAG, String.format("onLoadFinished() row count is %d", data.getCount()));
+        final Context context = getActivity();
+        if (context == null) throw new IllegalStateException("getActivity() returned null");
         setListAdapter(new ActivityAdapter(getActivity(), data));
         getListView().setOnItemClickListener(this);
         data.setNotificationUri(getActivity().getContentResolver(),

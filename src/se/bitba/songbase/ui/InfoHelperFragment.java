@@ -8,11 +8,13 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
 public class InfoHelperFragment
         extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>
 {
+    private static final String TAG = InfoHelperFragment.class.getSimpleName();
     private static final String CONTENT_URI = "CONTENT_URI";
     private static final String PROJECTION = "PROJECTION";
     private static final String SELECTION = "SELECTION";
@@ -34,6 +36,7 @@ public class InfoHelperFragment
 
     @Override
     public void onAttach(Activity activity) {
+        Log.d(TAG, String.format("onAttach(%s)", activity));
         super.onAttach(activity);
         mObserver = (Callbacks)activity;
     }

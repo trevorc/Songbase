@@ -6,6 +6,7 @@
 
 package se.bitba.songbase.ui;
 
+import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -15,10 +16,14 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
-import org.jetbrains.annotations.NotNull;
 import se.bitba.songbase.R;
 import se.bitba.songbase.provider.SongbaseContract;
 
@@ -45,7 +50,9 @@ public class StationDetailFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mStationId = getArguments().getLong(STATION_ID);
+        final Bundle arguments = getArguments();
+        assert arguments != null;
+        mStationId = arguments.getLong(STATION_ID);
 
         final Cursor cursor = getActivity().getContentResolver().query(
                 SongbaseContract.Station.CONTENT_URI,
@@ -66,7 +73,7 @@ public class StationDetailFragment
     }
 
     @Override
-    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_station_detail, container, false);
         assert view != null;
 
@@ -90,6 +97,7 @@ public class StationDetailFragment
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_station_detail_actions, menu);
         final MenuItem favoriteItem = menu.findItem(R.id.action_favorite);
+        assert favoriteItem != null;
         favoriteItem.setChecked(mIsFavorite);
         favoriteItem.setIcon(mIsFavorite ?
                                      android.R.drawable.btn_star_big_on :
@@ -98,10 +106,12 @@ public class StationDetailFragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        final Activity activity = getActivity();
+        if (activity == null) throw new IllegalStateException("getActivity() returned null");
         switch (item.getItemId()) {
             case R.id.action_favorite:
                 setFavorite(!mIsFavorite);
-                getActivity().invalidateOptionsMenu();
+                activity.invalidateOptionsMenu();
                 return true;
         }
         return super.onOptionsItemSelected(item);

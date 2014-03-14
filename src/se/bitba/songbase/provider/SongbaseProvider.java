@@ -19,7 +19,6 @@ import android.provider.BaseColumns;
 import android.util.Log;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableMap;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -150,9 +149,11 @@ public class SongbaseProvider
 
         switch (URI_MATCHER.match(uri)) {
             case ACTIVITIES: {
+                final String activityId = values.getAsString(ActivityColumns.ACTIVITY_ID);
+                if (activityId == null) throw new IllegalArgumentException("ACTIVITY_ID is missing");
                 db.insertOrThrow(Tables.ACTIVITIES, null, values);
                 contentResolver.notifyChange(uri, null);
-                return SongbaseContract.Activity.buildActivityUri(values.getAsString(ActivityColumns.ACTIVITY_ID));
+                return SongbaseContract.Activity.buildActivityUri(activityId);
             }
             case STATIONS: {
                 final boolean isBare = uri.getBooleanQueryParameter(
@@ -187,7 +188,7 @@ public class SongbaseProvider
     }
 
     @Override
-    public int bulkInsert(Uri uri, @NotNull ContentValues[] values) {
+    public int bulkInsert(Uri uri, ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int numValues = values.length;
         assert db != null;

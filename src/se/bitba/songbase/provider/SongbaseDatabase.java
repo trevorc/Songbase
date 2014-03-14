@@ -23,10 +23,10 @@ public class SongbaseDatabase
     interface Tables {
         String ACTIVITIES = "activities";
         String STATIONS = "stations";
-        String ACTIVITIES_JOIN_STATIONS = ACTIVITIES + " " +
-                "LEFT JOIN " + STATIONS + " " +
-                "ON " + ACTIVITIES + "." + ActivityColumns.ACTIVITY_ID + "=" +
-                STATIONS + "." + StationColumns.ACTIVITY_ID;
+        String ACTIVITIES_JOIN_STATIONS = ACTIVITIES + ' ' +
+                "LEFT JOIN " + STATIONS + ' ' +
+                "ON " + ACTIVITIES + '.' + ActivityColumns.ACTIVITY_ID + '=' +
+                STATIONS + '.' + StationColumns.ACTIVITY_ID;
         String FAVORITES = "favorites";
         String FEATURED_ARTISTS = "featured_artists";
     }
@@ -35,12 +35,12 @@ public class SongbaseDatabase
         String STATION_COUNT = "(SELECT " +
                 "COUNT(station_count." + BaseColumns._ID + ") " +
                 "FROM " + Tables.STATIONS + " station_count " +
-                "WHERE station_count." + StationColumns.ACTIVITY_ID + "=" +
-                Tables.ACTIVITIES + "." + ActivityColumns.ACTIVITY_ID + ")";
+                "WHERE station_count." + StationColumns.ACTIVITY_ID + '=' +
+                Tables.ACTIVITIES + '.' + ActivityColumns.ACTIVITY_ID + ')';
         String IS_FAVORITE = "EXISTS (SELECT 1 " +
                 "FROM " + Tables.FAVORITES + " station_favorite " +
-                "WHERE station_favorite." + FavoriteColumns.STATION_ID + "=" +
-                Tables.STATIONS + "." + StationColumns.STATION_ID + ")";
+                "WHERE station_favorite." + FavoriteColumns.STATION_ID + '=' +
+                Tables.STATIONS + '.' + StationColumns.STATION_ID + ')';
     }
 
     public SongbaseDatabase(Context context) {
